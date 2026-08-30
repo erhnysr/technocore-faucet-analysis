@@ -9,8 +9,8 @@
 of thousands of unanswered requests — and why, at the protocol level, none of it
 can be told apart from farming.*
 
-Draft — not published. Factual observations only; no claims about anyone's
-intent, and no repositories or individuals are named (see *Attribution*, below).
+Factual observations only; no claims about anyone's intent, and no repositories
+or individuals are named (see *Attribution*, below).
 
 ---
 

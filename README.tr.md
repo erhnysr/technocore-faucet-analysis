@@ -7,8 +7,8 @@
 bir odanın durduğu — ve neden protokol düzeyinde bunların hiçbirinin farming'den
 ayırt edilemediği.*
 
-Taslak — yayınlanmadı. Yalnızca olgusal gözlemler; kimsenin niyeti hakkında iddia
-yok ve hiçbir depo ya da kişi adıyla anılmıyor (bkz. *Atıf* bölümü).
+Yalnızca olgusal gözlemler; kimsenin niyeti hakkında iddia yok ve hiçbir depo ya
+da kişi adıyla anılmıyor (bkz. *Atıf* bölümü).
 
 ---
 
