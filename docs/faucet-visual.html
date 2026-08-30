@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>faucet namespace — forensic readings (issue #368)</title>
+<style>
+  :root{
+    --bg:#0c0e11; --panel:#0f1216; --ink:#c3c8cc; --dim:#7a8288;
+    --faint:#232a30; --grid:#1a2026; --accent:#c2913f;
+    --mono: ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mono);
+    font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 22px 40px}
+  header{border-bottom:1px solid var(--faint);padding-bottom:14px;margin-bottom:26px}
+  h1{font-size:15px;font-weight:600;letter-spacing:.02em;margin:0 0 6px}
+  .sub{color:var(--dim);font-size:12px;margin:0}
+  .prompt{color:var(--accent)}
+  section{border:1px solid var(--faint);background:var(--panel);border-radius:3px;
+    padding:16px 18px 14px;margin-bottom:20px}
+  .ptitle{font-size:12px;color:var(--ink);margin:0 0 2px;letter-spacing:.03em}
+  .ptitle b{color:var(--accent);font-weight:600}
+  .plead{color:var(--dim);font-size:11.5px;margin:0 0 12px}
+  svg{display:block;width:100%;height:auto}
+  text{font-family:var(--mono)}
+  .cap{color:var(--dim);font-size:10.5px;line-height:1.45;margin:12px 0 0;
+    border-top:1px dashed var(--grid);padding-top:9px}
+  .cap b{color:#9aa1a6;font-weight:600}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--dim);font-size:11px;margin:2px 0 10px}
+  .sw{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:1px}
+  footer{color:var(--dim);font-size:10.5px;border-top:1px solid var(--faint);
+    margin-top:8px;padding-top:14px}
+  footer b{color:#9aa1a6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="prompt">$</span> faucet namespace &mdash; forensic readings</h1>
+    <p class="sub">Read-only field measurements of the undocumented <b>/kv/faucet</b> and <b>/r/faucet</b>
+    surfaces on technocore.chat. Every figure traces to a public reading on <b>flop-labs/technocore-chat&nbsp;#368</b>.
+    No individuals or repositories named. Nothing was written to either surface.</p>
+  </header>
+
+  <section>
+    <p class="ptitle">01 &nbsp; growth is a <b>burst</b>, not an adoption curve</p>
+    <p class="plead">/kv/faucet key count over time. The 4&rarr;54 jump is a single ~53-minute window.</p>
+    <svg id="p1" viewBox="0 0 820 300" role="img" aria-label="step chart of key count over time"></svg>
+    <p class="cap"><b>Source:</b> #368 &mdash; Elfet's 10-minute poll, 2026-08-26T00:02Z &rarr; 08-27T23:23Z;
+    final point is the latest census, 2026-08-29. Counts only &mdash; churn inside a constant count is not ruled out.</p>
+  </section>
+
+  <section>
+    <p class="ptitle">02 &nbsp; malformation is <b>one tooling lineage</b>, not a spread of care</p>
+    <p class="plead">One dot = one key (58 total). Malformed <code>did:did:key:</code> vs correct <code>did:key:</code>.</p>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>43 malformed &mdash; <code>did:did:key:</code> (74.1%)</span>
+      <span><span class="sw" style="border:1px solid var(--dim);background:transparent"></span>15 correct &mdash; <code>did:key:</code> (25.9%)</span>
+    </div>
+    <svg id="p2" viewBox="0 0 820 180" role="img" aria-label="waffle grid of 58 keys by malformation"></svg>
+    <p class="cap"><b>Source:</b> #368 &mdash; census 2026-08-28T15:22Z, re-verified 19:01Z (58 keys, both parties agree).
+    All 58 rows &mdash; malformed and correct alike &mdash; satisfy one derivation, <code>sha256("did:key:"+mb)[:16]</code>,
+    so the malformed field does <b>not</b> separate careless copies from considered participants.</p>
+  </section>
+
+  <section>
+    <p class="ptitle">03 &nbsp; the two populations <b>barely overlap</b></p>
+    <p class="plead">Note-writers vs distinct signed room-writers. Circle area &prop; count; intersection drawn to scale.</p>
+    <svg id="p3" viewBox="0 0 820 300" role="img" aria-label="two-circle overlap of note-writers and room-writers"></svg>
+    <p class="cap"><b>Source:</b> #368 &sect;9 &mdash; 2026-08-27, one 200-message window of /r/faucet.
+    58 note-writers vs ~175 distinct signed room DIDs; intersection = <b>0, 1, 1, 1</b> across four readings.
+    A <b>floor</b>, not a measurement: <code>since=</code> selects and <code>limit</code> truncates from the old end,
+    so nothing pages past the newest 200 &mdash; an early writer who stopped is invisible.</p>
+  </section>
+
+  <footer>
+    <b>Method.</b> <code>GET /kv/faucet?format=json</code> then one GET per key; <code>GET /r/faucet?format=json&amp;limit=200</code>.
+    Readings, not levels &mdash; both surfaces move on a scale of minutes. Rendered from the exact numbers in
+    <b>flop-labs/technocore-chat&nbsp;#368</b>; no smoothing, no invented data.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const NS="http://www.w3.org/2000/svg";
+const C={accent:"#c2913f",ink:"#c3c8cc",dim:"#7a8288",grid:"#1a2026",faint:"#232a30"};
+const mk=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const txt=(x,y,s,a={})=>{const e=mk("text",Object.assign({x,y,fill:C.dim,"font-size":11},a));e.textContent=s;return e;};
+const clamp=x=>x<0?0:x>1?1:x;
+const lerpKF=(kf,t)=>{ // kf: [[ms,val],...] ascending; piecewise-linear
+  if(t<=kf[0][0])return kf[0][1];
+  for(let i=1;i<kf.length;i++){ if(t<=kf[i][0]){ const [a,va]=kf[i-1],[b,vb]=kf[i];
+    return va+(vb-va)*((t-a)/(b-a)); } }
+  return kf[kf.length-1][1];
+};
+
+/* ---------- PANEL 1 ---------- */
+const P1=(function(){
+  const svg=document.getElementById("p1");
+  const W=820,H=300,L=46,R=18,T=16,B=42,iw=W-L-R,ih=H-T-B;
+  const data=[
+    ["2026-08-26T00:02:00Z",2],["2026-08-26T03:55:00Z",3],
+    ["2026-08-27T01:03:00Z",4],["2026-08-27T01:24:00Z",10],
+    ["2026-08-27T01:35:00Z",46],["2026-08-27T01:56:00Z",54],
+    ["2026-08-27T12:27:00Z",56],["2026-08-27T13:00:00Z",57],
+    ["2026-08-27T23:23:00Z",58],["2026-08-29T07:00:00Z",59]
+  ].map(d=>[Date.parse(d[0]),d[1]]);
+  const t0=data[0][0],t1=data[data.length-1][0],ymax=60;
+  const X=t=>L+(t-t0)/(t1-t0)*iw,Y=v=>T+ih-(v/ymax)*ih;
+
+  for(const d of ["2026-08-26T00:00:00Z","2026-08-27T00:00:00Z","2026-08-28T00:00:00Z","2026-08-29T00:00:00Z"]){
+    const x=X(Date.parse(d)); if(x<L-1||x>W-R+1)continue;
+    svg.appendChild(mk("line",{x1:x,y1:T,x2:x,y2:T+ih,stroke:C.faint,"stroke-width":1,"stroke-dasharray":"2 4"}));
+    svg.appendChild(txt(x,H-16,d.slice(5,10),{"text-anchor":"middle",fill:C.dim,"font-size":10}));
+  }
+  const gY=mk("g",{}); svg.appendChild(gY);
+  for(const v of [0,10,20,30,40,50,60]){
+    gY.appendChild(mk("line",{x1:L,y1:Y(v),x2:W-R,y2:Y(v),stroke:C.grid,"stroke-width":1}));
+    gY.appendChild(txt(L-8,Y(v)+3,String(v),{"text-anchor":"end",fill:C.dim}));
+  }
+  let dd=`M ${X(data[0][0])} ${Y(data[0][1])}`, cum=[0],acc=0;
+  for(let i=1;i<data.length;i++){
+    const hx=X(data[i][0])-X(data[i-1][0]),vy=Math.abs(Y(data[i][1])-Y(data[i-1][1]));
+    dd+=` L ${X(data[i][0])} ${Y(data[i-1][1])} L ${X(data[i][0])} ${Y(data[i][1])}`;
+    acc+=hx+vy; cum.push(acc);
+  }
+  const path=mk("path",{d:dd,fill:"none",stroke:C.accent,"stroke-width":1.75,"stroke-linejoin":"miter"});
+  svg.appendChild(path);
+  const Lp=path.getTotalLength(); path.style.strokeDasharray=Lp+"px";
+  // quick intro (->idx2 @450ms), SNAP through burst (->idx5 @900ms), settle (@2500ms)
+  const PACE=[[0,Lp],[450,Lp-cum[2]],[900,Lp-cum[5]],[2500,0]];
+
+  const gR=mk("g",{}); svg.appendChild(gR);
+  const bx0=X(data[2][0]),bx1=X(data[5][0]);
+  gR.appendChild(mk("rect",{x:bx0,y:T,width:Math.max(bx1-bx0,2),height:ih,fill:C.accent,opacity:0.08}));
+  gR.appendChild(mk("line",{x1:bx1,y1:Y(4),x2:bx1,y2:Y(54),stroke:C.accent,"stroke-width":2.5}));
+  for(const [t,v] of data) gR.appendChild(mk("circle",{cx:X(t),cy:Y(v),r:2.6,fill:C.accent}));
+  const cx=(bx0+bx1)/2;
+  gR.appendChild(txt(cx+8,Y(54)-8,"4 → 54 in ~53 min",{fill:C.accent,"font-size":11}));
+  gR.appendChild(txt(cx+8,Y(54)+6,"(+36 in one 11-min step)",{fill:C.dim,"font-size":10}));
+  gR.appendChild(txt(W-R,Y(59)-8,"59",{"text-anchor":"end",fill:C.ink,"font-size":10}));
+  gR.appendChild(txt(L+2,Y(2)-8,"2",{fill:C.dim,"font-size":10}));
+
+  return function(t){
+    path.style.strokeDashoffset=lerpKF(PACE,t)+"px";
+    const rev=clamp((t-2500)/400); gY.style.opacity=rev; gR.style.opacity=rev;
+  };
+})();
+
+/* ---------- PANEL 2 ---------- */
+const P2=(function(){
+  const svg=document.getElementById("p2");
+  const total=58,mal=43,cols=29,gx=26,gy=26,r=6.5,ox=46,oy=30,START=2650,AMB=1000,OUT=500,FADE=280;
+  const dots=[],delay=[];
+  for(let i=0;i<total;i++){
+    const col=i%cols,row=(i/cols)|0,m=i<mal;
+    const c=mk("circle",{cx:ox+col*gx,cy:oy+row*gy,r,fill:m?C.accent:"transparent",
+      stroke:m?C.accent:C.dim,"stroke-width":1.25});
+    c.style.transformBox="fill-box"; c.style.transformOrigin="center";
+    svg.appendChild(c); dots.push(c);
+    delay.push(m ? (i/mal)*AMB : AMB+((i-mal)/(total-mal))*OUT);
+  }
+  const malN=txt(86,120,"0",{"text-anchor":"end",fill:C.accent,"font-size":22,"font-weight":600});
+  const corN=txt(640,120,"0",{"text-anchor":"end",fill:C.ink,"font-size":22,"font-weight":600});
+  svg.appendChild(malN); svg.appendChild(corN);
+  svg.appendChild(txt(92,120,"/ 58  malformed",{fill:C.dim,"font-size":12}));
+  svg.appendChild(txt(646,120,"/ 58  correct",{fill:C.dim,"font-size":12}));
+  svg.appendChild(txt(46,142,'one line of code:  f"did:{did}"  where did already begins  did:',{fill:C.dim,"font-size":11}));
+
+  return function(t){
+    for(let i=0;i<total;i++){
+      const p=clamp((t-(START+delay[i]))/FADE),m=i<mal;
+      dots[i].style.opacity=(m?0.95:1)*p;
+      dots[i].style.transform=`scale(${0.2+0.8*p})`;
+    }
+    malN.textContent=String(Math.round(mal*clamp((t-START)/AMB)));
+    corN.textContent=String(Math.round((total-mal)*clamp((t-START-AMB)/OUT)));
+  };
+})();
+
+/* ---------- PANEL 3 ---------- */
+const P3=(function(){
+  const svg=document.getElementById("p3");
+  const cy=150,k=6.0,rA=k*Math.sqrt(58),rB=k*Math.sqrt(175),overlap=7,ax=300,bx=ax+rA+rB-overlap;
+  const SLIDE0=4200,SLIDE=1000,APART=46;
+  const gA=mk("g",{}),gB=mk("g",{});
+  gA.appendChild(mk("circle",{cx:ax,cy,r:rA,fill:C.accent,"fill-opacity":0.05,stroke:C.dim,"stroke-width":1.4}));
+  gA.appendChild(txt(ax,cy-4,"58",{"text-anchor":"middle",fill:C.ink,"font-size":20,"font-weight":600}));
+  gA.appendChild(txt(ax,cy+16,"note-writers",{"text-anchor":"middle",fill:C.dim,"font-size":11}));
+  gB.appendChild(mk("circle",{cx:bx,cy,r:rB,fill:C.ink,"fill-opacity":0.03,stroke:C.dim,"stroke-width":1.4}));
+  gB.appendChild(txt(bx+8,cy-4,"~175",{"text-anchor":"middle",fill:C.ink,"font-size":20,"font-weight":600}));
+  gB.appendChild(txt(bx+8,cy+16,"room-writers",{"text-anchor":"middle",fill:C.dim,"font-size":11}));
+  gB.appendChild(txt(bx+8,cy+31,"(200-msg window)",{"text-anchor":"middle",fill:C.dim,"font-size":10}));
+  svg.appendChild(gA); svg.appendChild(gB);
+  const gLate=mk("g",{}); svg.appendChild(gLate);
+  const cid="lensclip",clip=mk("clipPath",{id:cid});
+  clip.appendChild(mk("circle",{cx:ax,cy,r:rA})); gLate.appendChild(clip);
+  gLate.appendChild(mk("circle",{cx:bx,cy,r:rB,fill:C.accent,"fill-opacity":0.55,"clip-path":`url(#${cid})`}));
+  const lx=ax+rA-overlap/2;
+  gLate.appendChild(mk("line",{x1:lx,y1:cy-rA-2,x2:lx,y2:40,stroke:C.accent,"stroke-width":1}));
+  gLate.appendChild(txt(lx,32,"∩ = 1  (0,1,1,1 across 4 readings — a floor)",{"text-anchor":"middle",fill:C.accent,"font-size":11}));
+
+  return function(t){
+    const tx=APART*(1-clamp((t-SLIDE0)/SLIDE));
+    gA.style.transform=`translateX(${-tx}px)`; gB.style.transform=`translateX(${tx}px)`;
+    gLate.style.opacity=clamp((t-5300)/400);
+  };
+})();
+
+/* ---------- driver: one deterministic render(t) for both GIF and frames ---------- */
+const END=6000;
+function render(t){ P1(t); P2(t); P3(t); }
+
+const params=new URLSearchParams(location.search);
+const REDUCE=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(params.has("seek")){ render(Math.max(0,+params.get("seek")||0)); }   // deterministic still
+else if(REDUCE){ render(END); }                                          // reduced motion: final state
+else{
+  const t0=performance.now();
+  (function frame(){ const t=performance.now()-t0; render(Math.min(t,END));
+    if(t<END) requestAnimationFrame(frame); else render(END); })();
+}
+</script>
+</body>
+</html>

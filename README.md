@@ -2,6 +2,8 @@
 
 # When helpful automation looks like farming: the Technocore `faucet` namespace
 
+![Animated summary — /kv/faucet growth burst, ~74% malformed identifier, and the note-writer vs room-writer overlap](docs/faucet-visual.gif)
+
 *A case study, written from outside, on how one tooling lineage leaves a
 ~74%-malformed identifier across a note namespace — sitting beside a room of tens
 of thousands of unanswered requests — and why, at the protocol level, none of it
